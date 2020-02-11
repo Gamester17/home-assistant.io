@@ -21,9 +21,11 @@ ha_codeowners:
 ---
 
 [Zigbee Home Automation](https://zigbee.org/zigbee-for-developers/applicationstandards/zigbeehomeautomation/)
-integration for Home Assistant allows you to connect many off-the-shelf Zigbee based devices to Home Assistant, using one of the available Zigbee radio modules that is compatible with [zigpy](https://github.com/zigpy/zigpy) (an open source Python library implementing a Zigbee stack, which in turn relies on separate libraries which can each interface a with Zigbee radio module a different manufacturer).
+integration for Home Assistant allows you to connect many off-the-shelf Zigbee based devices to Home Assistant using one of the many Zigbee radio adapters/modulse that is compatible with [zigpy](https://github.com/zigpy/zigpy), an open source Python library implementing a Zigbee stack, (zigpy in turn depends on separate open source Python libraries to interface with Zigbee radio hardware from different manufacturers).
 
-There is currently support for the following device types within Home Assistant:
+Being a native integration in Home Assistant means that it uses its official user-interfaces and front-ends, and it is therefor also very simple to get started with. As it is a built-in components means that it and its interfaces are automatically updated with Home Assistant. There is no list of supported devices, as any devices compliant Zigbee Home Automation standard should work. Adding support for not working devices via ZHA Device Handlers is documented.
+
+This integration currently has support for the following device types within Home Assistant:
 
 - Binary Sensor
 - Cover
@@ -33,11 +35,16 @@ There is currently support for the following device types within Home Assistant:
 - Sensor
 - Switch
 
-## ZHA exception and deviation handling
+## What is Zigbee Home Automation?
+Zigbee Home Automation is a wireless communication protocol specification designed for personal area networks that is well suited to low-cost home automation devices. With the exception that Zigbee Home Automation operates within the unlicensed 2.4 GHz band worldwide, it is similar to the Z-Wave protocol in the wat that it also uses low-power and low-bandwidth digital radio to build a mesh-network that allows devices that are not in direct range of each other to communicate indirectly, via other nodes that uses the same Zigbee protocol specification.
 
-Zigbee devices that deviate from or do not fully conform to the standard specifications set by the [Zigbee Alliance](https://www.zigbee.org) may require the development of custom [ZHA Device Handlers](https://github.com/dmulcahey/zha-device-handlers) (ZHA custom quirks handler implementation) to for all their functions to work properly with the ZHA integration in Home Assistant. These ZHA Device Handlers for Home Assistant can thus be used to parse custom messages to and from Zigbee devices.
+Your main Zigbee radio module/adapter act as a "coordinator" in your mesh-network and many permanently powered Zigbee devices that are not battery powered will as such act as "routers" to help extend the mesh-network. Battery powered devices and other devices which do not act as routers are called "end devices", (Zigbee light bulbs are for example likley to act as an "end device" even though they are permanently powered). If you do not have enough routers or you locate your routers poorly then your Zigbee mesh-network can become unreliable.
 
-The custom quirks implementations for zigpy implemented as ZHA Device Handlers for Home Assistant are a similar concept to that of [Hub-connected Device Handlers for the SmartThings Classics platform](https://docs.smartthings.com/en/latest/device-type-developers-guide/) as well as that of [Zigbee-Shepherd Converters as used by Zigbee2mqtt](https://www.zigbee2mqtt.io/how_tos/how_to_support_new_devices.html), meaning they are each virtual representations of a physical device that expose additional functionality that is not provided out-of-the-box by the existing integration between these platforms.
+Before buying any Zigbee hardware you should be aware that each device model as well as the "coordinator" hardware in your mesh-network may also be deliver better or worse radio range than other device models. Also, while the hard limit of a single Zigbee mesh-network is some 65 thousand devices, Zigbee radio modules/adapters hardware from different manufacturers will different recommendations on how many routers that you can actually directly connect to it and how many that you can indirectly connect to their mesh-network as in total.
+
+Zigbee devices generally cost much less than similar Z-Wave devices, which is mainly due to all Z-Wave having to go though a certification process which is meant to make sure that all Z-Wave work togther for a uniformed intercompatible. Historically relying on compatibility between devices has not with Zigbee has not been the case, this has however gotten much better in modern Zigbee stacks and integration implementations, like ZHA in Home Assistant. Neither Zigbee or Z-Wave can be said to be universally better than the other as both technologies have different advantages and disadvantages over each other.
+
+In practice there is today no need to worry to much as most Zigbee mesh-network issues can be solved by relative simple toubleshooting. There are reports of Zigbee mesh-networks containing many several hundreds of devices that perform well, and many times toubleshooting can some times be as simple as making sure you have your "routers" that provide good range / radio strenght directly corrected to your "coordinator" as well as having your "end devices" connected to your best "routers".
 
 ## Known working Zigbee radio modules
 
@@ -132,6 +139,26 @@ Reset your Zigbee devices according to the device instructions provided by the m
 
 ## Troubleshooting
 
+### General tips
+
+Adding a USB extension cable will move your USB stick away from the computer you've connected it to. This can reduce interference, and improve your range.
+
+Add an external antenna to your coordinator, and position the antenna away from the computer.
+
+Ensure that any WiFi router/access point, WiFi USB stick, Z-Wave stick, or RF433 stick are as far away as you can get them (preferably at least one meter if you can). This will also reduce interference.
+
+Check the WiFi channels in use, to see if your router/access point is now talking over your Zigbee mesh. If so change the channel of the WiFi access point and lock it. If you have to change the channel of your Zigbee mesh then you'll have to re-pair your devices.
+
+Add more routers between the problem devices and the next nearest router.
+
+If you're still stuck at that point, head over the #zigbee channel on the [Home Assistant Discord server](https://discord.gg/c5DvZ4e), or the [Zigbee section of the community forum](https://community.home-assistant.io/c/configuration/zigbee).
+
+### ZHA exception and deviation handling
+
+Zigbee devices that deviate from or do not fully conform to the standard specifications set by the [Zigbee Alliance](https://www.zigbee.org) may require the development of custom [ZHA Device Handlers](https://github.com/dmulcahey/zha-device-handlers) (ZHA custom quirks handler implementation) to for all their functions to work properly with the ZHA integration in Home Assistant. These ZHA Device Handlers for Home Assistant can thus be used to parse custom messages to and from Zigbee devices.
+
+The custom quirks implementations for zigpy implemented as ZHA Device Handlers are a similar concept to that of [Hub-connected Device Handlers for the SmartThings Classics platform](https://docs.smartthings.com/en/latest/device-type-developers-guide/) as well that of [Zigbee-Herdsman Converters / Zigbee-Shepherd Converters as used by Zigbee2mqtt](https://www.zigbee2mqtt.io/how_tos/how_to_support_new_devices.html), meaning they are virtual representation of a physical device that expose additional functionality that is not provided out-of-the-box by the existing integration between these platforms. See [Device Specifics](#Device-Specifics) for details.
+
 ### Add Philips Hue bulbs that have previously been added to another bridge
 
 Philips Hue bulbs that have previously been added to another bridge won't show up during search. You have to restore your bulbs back to factory settings first. To achieve this, you basically have the following options.
@@ -187,3 +214,16 @@ services:
     restart: always
     network_mode: host
 ```
+## Related projects and development
+
+### Zigpy
+[Zigpy](https://github.com/zigpy/zigpy)** is **[Zigbee protocol stack](https://en.wikipedia.org/wiki/Zigbee)** integration project to implement the **[Zigbee Home Automation](https://www.zigbee.org/)** standard as a Python 3 library. Zigbee Home Automation integration with zigpy allows you to connect one of many off-the-shelf Zigbee adapters using one of the available Zigbee radio library modules compatible with zigpy to control Zigbee based devices. There is currently support for controlling Zigbee device types such as binary sensors (e.g., motion and door sensors), sensors (e.g., temperature sensors), lightbulbs, switches, and fans. A working implementation of zigbe exist in **[Home Assistant](https://www.home-assistant.io)** (Python based open source home automation software) as part of its **[ZHA component](https://www.home-assistant.io/components/zha/)**
+
+### ZHA Map
+Home Assistant can build ZHA network topology map using the [zha-map](https://github.com/zha-ng/zha-map) project.
+
+### zha-network-visualization-card
+[zha-network-visualization-card](https://github.com/dmulcahey/zha-network-visualization-card) is a custom Lovelace element for visualizing the ZHA Zigbee network in Home Assistant.
+
+### ZHA Network Card
+[zha-network-card](https://github.com/dmulcahey/zha-network-card) is a custom Lovelace card that displays ZHA network and device information in Home Assistant
